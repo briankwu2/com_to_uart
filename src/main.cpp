@@ -1,7 +1,6 @@
 /*
 TODO:
 - Implement mutexes to protect the queue
-- Needs to protect Serial from looping and resending information
 
 
 
