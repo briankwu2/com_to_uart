@@ -29,6 +29,7 @@ void receiveUSBTask(void* parameter);
 
 void configSerialUART ();
 void flushSerial();
+void processString(String str);
 
 
 
@@ -47,8 +48,8 @@ void setup() {
 
   // Create the send and receive tasks
   xTaskCreate(sendTask, "SendTask", 1024, NULL, 1, NULL);
-  xTaskCreate(receiveTask, "ReceiveTask", 1024, NULL, 1, NULL);
-  xTaskCreate(receiveUSBTask, "ReceiveUSBTask", 1024, NULL, 1, NULL);
+  xTaskCreate(receiveTask, "ReceiveTask", 2048, NULL, 1, NULL);
+  xTaskCreate(receiveUSBTask, "ReceiveUSBTask", 2048, NULL, 1, NULL);
   xTaskCreate(blinkLEDForeverTask, "BlinkLED", 1024, NULL, 1, NULL);
 
   vTaskStartScheduler();
@@ -131,6 +132,7 @@ void receiveTask(void* parameter) {
     while (Serial2.available()) {
       char c = Serial2.read(); // Reads a character
       Serial.print(c); // Sends to Serial Monitor
+      
     }
 
     // Not needed? Causes issues with sending however, unsure why
@@ -175,3 +177,16 @@ void flushSerial() {
   }
 }
 
+
+/**
+ * @brief Processes the string received from the GPIO UART Channel
+ * 
+ * 
+ * Currently processes these commands:
+ *  -getipaddr 
+ * @param str 
+ */
+void processString(String str) {
+
+  // Process and strip the OpenThread Output
+}
