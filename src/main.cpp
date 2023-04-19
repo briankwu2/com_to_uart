@@ -1,10 +1,10 @@
 /*
 TODO:
-- Implement mutexes to protect the queue
 
 
 
 */
+#include <SD.h>
 #include <FreeRTOS_TEENSY4.h>
 #include <task.h>
 #include <queue.h>
@@ -19,6 +19,8 @@ TODO:
 // Instantiate queues to pass message from receiveTask to sendTask
 QueueHandle_t xQueue;
 
+File loggingFile;
+const char fileName [] = "loggingFile.txt";
 
 
 // FreeRTOS Tasks
@@ -62,16 +64,42 @@ void loop() {
   // Nothing to do here when using FreeRTOS
 }
 
+
+
+/**
+ * @brief Initialize the SD Card
+ * 
+ * 
+ */
+void initSDCard()
+{
+  // Initialize the SD card
+  if (!SD.begin(BUILTIN_SDCARD)) {
+    Serial.println("SD Card initialization failed!");
+    while (1);
+  }
+
+  Serial.println("SD Card initialization done.");
+  loggingFile = SD.open(fileName, FILE_WRITE);
+
+  if (!loggingFile.available())
+    Serial.println("File not opened correctly");
+
+  Serial.printf("File %s opened and available for write...\n", fileName);
+}
+
+
+
 void configSerialUART () {
   // Wait for the CLI interface to be available
 
   Serial2.begin(115200);
-
   while (!Serial2);
 
   Serial.write("[CONFIG]: Serial 2 is up\n");
 
 }
+
 
 
 // --------------Tasks----------------
@@ -130,10 +158,13 @@ void receiveTask(void* parameter) {
 
     // Read all available characters from the Serial2 port  (blocking)
     while (Serial2.available()) {
-      char c = Serial2.read(); // Reads a character
-      Serial.print(c); // Sends to Serial Monitor
-      
+      String str = Serial2.readString();
+
+      Serial.print(str); // Sends to Serial Monitor
     }
+
+    // Maybe check for if you need to wait for the termination character "\n"
+    // readStringUntil (use \n) terminator
 
     // Not needed? Causes issues with sending however, unsure why
     // flushSerial(); // Prevents data sent to Serial to be received by receiveUSBTask
