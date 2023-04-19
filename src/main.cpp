@@ -86,6 +86,8 @@ void initSDCard()
     Serial.println("File not opened correctly");
 
   Serial.printf("File %s opened and available for write...\n", fileName);
+  loggingFile.println("Start of Logging File");
+
 }
 
 
@@ -160,6 +162,10 @@ void receiveTask(void* parameter) {
     while (Serial2.available()) {
       String str = Serial2.readString();
 
+      // Sends the string to the SD Card
+      if (loggingFile.availableForWrite())
+        loggingFile.println(str);
+
       Serial.print(str); // Sends to Serial Monitor
     }
 
@@ -208,16 +214,3 @@ void flushSerial() {
   }
 }
 
-
-/**
- * @brief Processes the string received from the GPIO UART Channel
- * 
- * 
- * Currently processes these commands:
- *  -getipaddr 
- * @param str 
- */
-void processString(String str) {
-
-  // Process and strip the OpenThread Output
-}
